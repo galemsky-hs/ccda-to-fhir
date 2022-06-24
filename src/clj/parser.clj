@@ -1,6 +1,7 @@
 (ns parser
   (:require [schema :as s]
-            [xml :as xml]))
+            [xml :as xml]
+            [clojure.string :as str]))
 
 (defn parse-node-with-schema [node {:keys [collection? value? fields attrs] :as schema}]
   #_(prn "NOD " (:tag node) schema (when-not (= :ClinicalDocument (:tag node))
@@ -55,20 +56,47 @@
         (->> (concat attrs fields)
              (into {}))))))
 
+;(defn ccda-xml->json [parsed-xml]
+;  (let [doc-schemas (->> (xml/get-child-nodes parsed-xml :templateId)
+;                         (map :attrs)
+;                         (map (fn [{:keys [root extension]}]
+;                                (str root (when extension ":") extension)))
+;                         (map #(get s/doc-schema %))
+;                         (filter some?))
+;        parsed (->> doc-schemas
+;                    (map #(parse-node-with-schema parsed-xml %))
+;                    (apply merge))]
+;    parsed))
+
+(defn parse-node [{:keys [tag attrs content] :as tag-node}]
+  (let [first-content (first content)]
+    {tag (merge attrs
+                (cond
+                  (map? first-content)
+                  (->> content
+                       (remove (fn [{:keys [attrs content] :as nod}]
+                                 (and (nil? attrs)
+                                      (nil? content))))
+                       (mapv parse-node)
+                       (reduce (fn [m node]
+                                 (let [[tag node-value] (first node)]
+                                   (update m tag #(-> (or % [])
+                                                      (conj node-value)))))
+                               {}))
+                  (string? first-content)
+                  {:value content}
+
+                  (nil? content) nil
+
+                  :else {:ERROR content}))}))
+
 (defn ccda-xml->json [parsed-xml]
-  (let [doc-schemas (->> (xml/get-child-nodes parsed-xml :templateId)
-                         (map :attrs)
-                         (map (fn [{:keys [root extension]}]
-                                (str root (when extension ":") extension)))
-                         (map #(get s/doc-schema %))
-                         (filter some?))
-        parsed (->> doc-schemas
-                    (map #(parse-node-with-schema parsed-xml %))
-                    (apply merge))]
-    parsed))
+  (parse-node parsed-xml))
 
 (defn ccda-file->json [file-path]
   (comment (ccda-file->json "resource/sample.xml"))
 
   (let [doc (xml/parse-xml-file file-path)]
-    (ccda-xml->json doc)))
+    (ccda-xml->json doc)
+    #_(xml/parse-xml-file file-path)))
+
