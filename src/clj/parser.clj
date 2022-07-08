@@ -3,6 +3,44 @@
             [xml :as xml]
             [clojure.string :as str]))
 
+(defn next [state acc & [tag content]]
+  (let [state (or state init)
+        acc   (or acc {})]
+    (case state
+      :exit acc
+
+      :init
+      (case tag
+        :ClinicalDocument
+        (next :read-tree acc [tag content])
+
+        (next :exit acc))
+
+      :read-tree
+      (cond
+        (and (nil? tag) (nil? content))
+        (next :exit acc)
+
+        (= :patient tag)
+        (next :read-tree
+              (->> content
+                   (filter #(= :name (key %)))
+                   (reduce-kv (fn [a _ v]
+                                (assoc-in a :name
+                                          (mapv
+                                           (fn [x]
+                                             {:family (get-in x [:family 0 :value 0])
+                                              :given  (mapv #(get-in % [:value 0]) (:given x))})
+                                           v)))
+                              acc)))
+
+        true
+        (reduce-kv (fn [a k v]
+                     (next :tree-read a [k v]))
+                   acc
+                   content)))))
+
+
 (defn parse-node-with-schema [node {:keys [collection? value? fields attrs] :as schema}]
   #_(prn "NOD " (:tag node) schema (when-not (= :ClinicalDocument (:tag node))
                                      (:content node)))
