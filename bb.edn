@@ -1,0 +1,6 @@
+{:tasks
+ {:requires ([babashka.fs :as fs])
+
+  repl
+  {:doc  "Run Clojure repl for Emacs with cider"
+   :task (clojure "-M:cider/nrepl:build")}}}
