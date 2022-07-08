@@ -3,6 +3,22 @@
              [matcho.core :as matcho]
              [parser :as p]))
 
+(deftest automate-programming-test
+  (def name
+    {:tag :patient
+     :attrs nil
+     :content [{:tag :name,
+                :attrs {:use "L"},
+                :content
+                [{:tag :family, :attrs nil, :content ["Newman"]}
+                 {:tag :given, :attrs nil, :content ["Alice"]}
+                 {:tag :given, :attrs nil, :content ["Jones"]}]}]})
+  (testing "name "
+    (matcho/match (p/parse-patient name {:practitioner {}})
+                  {:patient {:name [{:given ["Alice" "Jones"]
+                                     :family "Newman"}]}
+                   :practitioner {}})))
+
 (deftest parser-initial-test
   (testing "if something unusual is met - we add ERROR"
     (def first-map {:tag :route
