@@ -74,7 +74,7 @@
                 (cond
                   (map? first-content)
                   (->> content
-                       (remove (fn [{:keys [attrs content] :as nod}]
+                       (remove (fn [{:keys [attrs content]}]
                                  (and (nil? attrs)
                                       (nil? content))))
                        (mapv parse-node)
@@ -94,7 +94,8 @@
   (parse-node parsed-xml))
 
 (defn ccda-file->json [file-path]
-  (comment (ccda-file->json "resource/sample.xml"))
+  (comment (ccda-file->json "resource/sample.xml") )
+  (comment (xml/parse-xml-file "resource/sample.xml") )
 
   (let [doc (xml/parse-xml-file file-path)]
     (ccda-xml->json doc)
