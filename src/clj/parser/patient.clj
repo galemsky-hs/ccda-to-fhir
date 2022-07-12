@@ -1,10 +1,12 @@
-(ns parser.patient)
+(ns parser.patient
+  (:require [parser :as p]))
+
+(p/next nil nil [:ClinicalDocument (:ClinicalDocument (p/ccda-file->json "resource/sample.xml"))])
+
+; @p/d
 
 (defn parse-patient
   [acc {:keys [patient]}])
-
-(cond-> {}
-  patient (parse-patient patient))
 
 
 (defmulti dispatch-resource

@@ -3,9 +3,17 @@
             [xml :as xml]
             [clojure.string :as str]))
 
-(defn next [state acc & [tag content]]
-  (let [state (or state init)
-        acc   (or acc {})]
+(def d (atom {}))
+
+(defn debug
+  [k v]
+  (swap! d assoc (gensym k) v))
+
+(defn next [state acc [tag content]]
+  (let [state (or state :init)
+        acc   (or acc {})
+        _ (debug :state  state)
+        _ (debug :content  content)]
     (case state
       :exit acc
 
@@ -19,7 +27,7 @@
       :read-tree
       (cond
         (and (nil? tag) (nil? content))
-        (next :exit acc)
+        (next :exit acc [nil nil])
 
         (= :patient tag)
         (next :read-tree
@@ -33,10 +41,11 @@
                                               :given  (mapv #(get-in % [:value 0]) (:given x))})
                                            v)))
                               acc)))
+       (not (map? content)) (next :read-tree acc [nil nil])
 
         true
         (reduce-kv (fn [a k v]
-                     (next :tree-read a [k v]))
+                     (next :read-tree a [k v]))
                    acc
                    content)))))
 
