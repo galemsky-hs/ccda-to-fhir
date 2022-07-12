@@ -1,0 +1,40 @@
+** CCDA TO FHIR
+Goal: create a working instance of CCDA to FHIR converter
+Team: Nikolay Ryghikov, Dmitry Egorov, Genych Alemskiy, Artem Alexeev etc.
+
+** Preparational work:
+
+- Read cCDA documentation and understand key concepts of cCDA, CDA
+
+    Resources:
+     - [[file:Keith W. Boone (auth.) - The CDA TM book (2011, Springer-Verlag London) - libgen.lc.pdf][the CDA book]]
+     - [[http://www.hl7.org/implement/standards/product_brief.cfm?product_id=186][official HL7v3 documentation]]
+     - [[file:What-is-C-CDA-R2-v2.0_WEDI-Summer-Forum_Hamm.pdf][what is cCDA]]
+
+    Useful links:
+     https://trifolia.lantanagroup.com/TemplateManagement/List
+     https://trifolia.lantanagroup.com/TemplateManagement/View/OID/2.16.840.1.113883.10.20.29.1
+     https://hl7-c-cda-examples.herokuapp.com/
+     https://habrahabr.ru/post/255879/
+     https://habr.com/ru/post/303716/
+     https://habr.com/ru/post/257517/
+     https://hfst.github.io/
+
+- Automata-based programming:
+
+    Resources:
+    - [[https://www.youtube.com/watch?v=PPWTxceMutk][video: Automata Programming - A. Shalyto]]
+    - [[file:Shalyto_Polikarpova_Avtomatnoe_Programmirovanie.pdf][book: Automata Programming - A.Shalyto, N.Polykarpova]]
+
+** Plan:
+ - Documentation:
+   - create documentation using natural language
+ - Automata Schema:
+   - create automata schema using some of reccomended instruments (decide which one)
+ - Tests:
+   - write tests based on automata schema
+   - create data for tests
+ - Code:
+   - write code to make tests green
+ - Article:
+   - write an article (e.g. 'Functional approach to automata based programming on example of cCDA to FHIR converter.')
