@@ -34,3 +34,4 @@ test-html/
 .lsp/
 /pgdata/
 /test/jsdom/.m2/
+/docs/*.pdf
