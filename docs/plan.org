@@ -10,6 +10,7 @@ Team: Nikolay Ryghikov, Dmitry Egorov, Genych Alemskiy, Artem Alexeev etc.
      - [[file:Keith W. Boone (auth.) - The CDA TM book (2011, Springer-Verlag London) - libgen.lc.pdf][the CDA book]]
      - [[http://www.hl7.org/implement/standards/product_brief.cfm?product_id=186][official HL7v3 documentation]]
      - [[file:What-is-C-CDA-R2-v2.0_WEDI-Summer-Forum_Hamm.pdf][what is cCDA]]
+     - [[https://www.youtube.com/watch?v=7LwqznbApaY][CDA workshop]]
 
     Useful links:
      https://trifolia.lantanagroup.com/TemplateManagement/List
