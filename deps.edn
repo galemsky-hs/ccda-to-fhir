@@ -1,7 +1,7 @@
 {:paths ["src/clj"]
  :deps  {org.clojure/clojure    {:mvn/version "1.11.1"}}
  :aliases
- {:cider/nrepl {:extra-paths ["resource" "test"]
+ {:cider/nrepl {:extra-paths ["resource" "test" "dev"]
                 :extra-deps  {nrepl/nrepl                   {:mvn/version "0.9.0"}
                               cider/cider-nrepl             {:mvn/version "LATEST"}
                               babashka/process              {:mvn/version "0.1.1"}
