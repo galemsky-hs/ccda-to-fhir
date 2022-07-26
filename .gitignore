@@ -1,6 +1,7 @@
 pom.xml
 pom.xml.asc
 *.class
+dev-resources/
 /lib/
 /jars/
 /target/
