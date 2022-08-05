@@ -36,3 +36,5 @@ test-html/
 /pgdata/
 /test/jsdom/.m2/
 /docs/*.pdf
+/melkosoft/
+/docs/presentation/
