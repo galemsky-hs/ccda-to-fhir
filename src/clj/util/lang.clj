@@ -32,3 +32,26 @@
                {}
                m)))
 
+(defn deep-merge
+  "Merges maps deeply"
+  [v & vs]
+  (letfn [(rec-merge [v1 v2]
+            (if (and (map? v1) (map? v2))
+              (merge-with deep-merge v1 v2)
+              v2))]
+    (if (some identity vs)
+      (reduce #(rec-merge %1 %2) v vs)
+      v)))
+
+(defn conj-in [m path value]
+  (update-in m path (fn [maybe-coll]
+                      (-> (or maybe-coll [])
+                          (conj value)))))
+
+(defn debug
+  "Prints result and returns it with tag"
+  [tag & body]
+  (let [result (last body)]
+    (println tag)
+    (clojure.pprint/pprint result)
+    result))
