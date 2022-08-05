@@ -147,15 +147,15 @@
 
 (defn ccda-file->json
   [file-path]
-  (comment (ccda-file->json "resource/sample.xml") )
-  (comment (xml/parse-xml-file "resource/sample.xml") )
+  (comment (ccda-file->json "resource/sample.xml"))
+  (comment (xml/parse-xml-file "resource/sample.xml"))
 
   (let [doc (xml/parse-xml-file file-path)]
     (ccda-xml->json doc)
     #_(xml/parse-xml-file file-path)))
 
 
-(w/postwalk (fn [x] )
+(w/postwalk (fn [x])
            (ccda-file->json "resource/sample.xml"))
 
 (defn get-path [m [k & ks :as keys]]
@@ -202,6 +202,24 @@
                          :value
                          ["Ms Alice Newman is being referred to Community Health Hospitals Inpatient facility because of the high fever noticed and suspected Anemia."]}]}]}]}]}]})
 
+(defn get-most-specific-template-id
+  "TODO: Choose template id with the newest extension"
+  [template-ids]
+  (first template-ids))
+
+(defn form-cda-cache-from-body [cda-edn]
+  (->> (get-path cda-edn [:ClinicalDocument :component 0
+                          :structuredBody
+                          :* :component])
+       (flatten)
+       (mapcat :section)
+       (group-by #(get-most-specific-template-id (:templateId %)))))
+
+(defn form-cda-cache [cda-edn]
+  (comment (form-cda-cache (ccda-file->json "resource/encounter-example.xml")))
+  (merge
+   (form-cda-cache-from-body cda-edn)))
+
 ;; (declare defrule)
 
 ;; (defrule "1.3.6.1.4.1.19376.1.5.3.1.3.1"
@@ -217,11 +235,11 @@
 
 ;; (defmethod)
 
-;; (def mapping-rules
-;;   {:discharge-summary {:template ["1.3.6.1.4.1.19376.1.5.3.1.3.1:2014-06-09"
-;;                                   "1.3.6.1.4.1.19376.1.5.3.1.3.1"]
-;;                        :paths {[:title 0 :value]
-;;                                [[:DocumentReference :subject]]}}})
+(def mapping-rules
+  {:discharge-summary {:template ["1.3.6.1.4.1.19376.1.5.3.1.3.1:2014-06-09"
+                                  "1.3.6.1.4.1.19376.1.5.3.1.3.1"]
+                       :paths {[:title 0 :value]
+                               [[:DocumentReference :subject]]}}})
 
 ;; (->> mapping-rules
 ;;      vals
