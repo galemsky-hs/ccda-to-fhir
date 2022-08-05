@@ -39,3 +39,5 @@ Team: Nikolay Ryghikov, Dmitry Egorov, Genych Alemskiy, Artem Alexeev etc.
    - write code to make tests green
  - Article:
    - write an article (e.g. 'Functional approach to automata based programming on example of cCDA to FHIR converter.')
+
+** Problems:

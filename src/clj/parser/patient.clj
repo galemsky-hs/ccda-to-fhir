@@ -6,8 +6,8 @@
 ; @p/d
 
 (defn parse-patient
-  [acc {:keys [patient]}])
-
+  [acc {:keys [patient]}]
+  {})
 
 (defmulti dispatch-resource
   (fn [acc resource-key node-content]
@@ -23,5 +23,4 @@
                 {:family [{:nullFlavor "NI"}],
                  :given [{:qualifier "BR", :value ["Alicia"]}]}]]
 (->> name-vec
-     (filterv (comp #{:name} :tag))
-     ))
+     (filterv (comp #{:name} :tag))))

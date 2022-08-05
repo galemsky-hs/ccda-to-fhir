@@ -1,9 +1,11 @@
 (ns parser
   (:require [schema :as s]
             [xml :as xml]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [clojure.walk :as w]))
 
-(def d (atom {}))
+(def d
+  (atom {}))
 
 (defn debug
   [k v]
@@ -50,7 +52,8 @@
                    content)))))
 
 
-(defn parse-node-with-schema [node {:keys [collection? value? fields attrs] :as schema}]
+(defn parse-node-with-schema
+  [node {:keys [collection? value? fields attrs] :as schema}]
   #_(prn "NOD " (:tag node) schema (when-not (= :ClinicalDocument (:tag node))
                                      (:content node)))
   (cond
@@ -115,7 +118,8 @@
 ;                    (apply merge))]
 ;    parsed))
 
-(defn parse-node [{:keys [tag attrs content] :as tag-node}]
+(defn parse-node
+  [{:keys [tag attrs content] :as tag-node}]
   (let [first-content (first content)]
     {tag (merge attrs
                 (cond
@@ -137,10 +141,12 @@
 
                   :else {:ERROR content}))}))
 
-(defn ccda-xml->json [parsed-xml]
+(defn ccda-xml->json
+  [parsed-xml]
   (parse-node parsed-xml))
 
-(defn ccda-file->json [file-path]
+(defn ccda-file->json
+  [file-path]
   (comment (ccda-file->json "resource/sample.xml") )
   (comment (xml/parse-xml-file "resource/sample.xml") )
 
@@ -148,3 +154,92 @@
     (ccda-xml->json doc)
     #_(xml/parse-xml-file file-path)))
 
+
+(w/postwalk (fn [x] )
+           (ccda-file->json "resource/sample.xml"))
+
+(defn get-path [m [k & ks :as keys]]
+  (if k
+    (if (= :* k)
+      (let [res (mapv #(get-path % ks) m)]
+        (if (empty? res) nil res))
+
+      (get-path
+       (cond
+         (map? k) (some (fn [i] (and (= i (into i k)) i)) m)
+         (number? k) (if (and (sequential? m) (< k (count m))) (nth m k) nil)
+         :else (get m k))
+       ks))
+    m))
+
+(-> "resource/sample.xml"
+    ccda-file->json
+    (get-path [:ClinicalDocument :component 0
+               :structuredBody
+               :* :component])
+    flatten
+    (->> (filterv (fn [x] (->> x
+                               :section
+                               (mapv :templateId)
+                               (mapv :root))))))
+
+    ;; all entities that have :component keyword
+    ;; and from them - filter one section
+    ;; that has templateId root value:
+    ;; 1.3.6.1.4.1.19376.1.5.3.1.3.1
+
+(def cda-cash {"1.3.6.1.4.1.19376.1.5.3.1.3.1"
+               [{:templateId
+                 [{:extension "2014-06-09", :root "1.3.6.1.4.1.19376.1.5.3.1.3.1"}
+                  {:root "1.3.6.1.4.1.19376.1.5.3.1.3.1"}],
+                 :code [{:codeSystem "2.16.840.1.113883.6.1", :code "42349-1"}],
+                 :title [{:value ["Reason for Referral"]}],
+                 :text
+                 [{:list
+                   [{:item
+                     [{:paragraph
+                       [{:styleCode "xSecondary",
+                         :value
+                         ["Ms Alice Newman is being referred to Community Health Hospitals Inpatient facility because of the high fever noticed and suspected Anemia."]}]}]}]}]}]})
+
+;; (declare defrule)
+
+;; (defrule "1.3.6.1.4.1.19376.1.5.3.1.3.1"
+;;   (fn [bullshit] (get-in bullshit [:title 0 :value])))
+
+;; (defn maprule
+;;   [cda-cash {:keys [template path]
+;;         :as rule}]
+;;   (mapv (fn [] (get-in ))))
+
+;; (defmulti dispatch-template
+;;   (fn [x] (->> x :section first :templateId (mapv :root))))
+
+;; (defmethod)
+
+;; (def mapping-rules
+;;   {:discharge-summary {:template ["1.3.6.1.4.1.19376.1.5.3.1.3.1:2014-06-09"
+;;                                   "1.3.6.1.4.1.19376.1.5.3.1.3.1"]
+;;                        :paths {[:title 0 :value]
+;;                                [[:DocumentReference :subject]]}}})
+
+;; (->> mapping-rules
+;;      vals
+;;      (mapv #(maprule cda-cash %)))
+
+;; orient on microsoft:
+;; template -> fhir
+
+
+;; take section
+;; take template id
+;; write rule engine (sic!)
+;; proto FHIR resource
+
+(def FHIR-Bundle
+  {:ProgressNote
+   {:problem [:section :problem :conclusion]
+    :allergies [:section :allergies :foo]
+    :document {:resourceType "DocumentReference"
+               :id [:resource :documentReference]}}
+   :Patient []})
